@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>FoodBite | Food Delivery</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="nav-container">
+      <div class="logo">QuickBite</div>
+      <div class="nav-buttons">
+        <button class="login-btn" id="openLogin">Log In</button>
+      </div>
+    </div>
+  </header>
+  <main class="container">
+    <section class="main-content">
+      <div class="restaurant-select">
+        <h2>Select a Restaurant</h2>
+        <select id="restaurantSelect" onchange="loadMenu()">
+          <option value="burgerHub">Burger Hub</option>
+          <option value="pizzaPalace">Pizza Palace</option>
+          <option value="tacoTown">Taco Town</option>
+        </select>
+      </div>
+      <h2>Menu</h2>
+      <div class="menu-grid" id="menuGrid">
+      </div>
+    </section>   
+    <aside class="cart-sidebar">
+      <h2>Your Order</h2>
+      <ul class="cart-items" id="cartItems">
+        <li class="empty-cart-text">Your cart is empty</li>
+      </ul>
+      <div class="cart-total">
+        <span>Total:</span>
+        <span id="cartTotal">Rs 0.00</span>
+      </div>
+      <button class="checkout-btn" onclick="placeOrder()">Place Order</button>
+    </aside>
+  </main>
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal">
+      <button class="close-modal" id="closeLogin">&times;</button>
+      <h2>Login</h2>
+      <form onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" required placeholder="user@example.com">
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" required>
+        </div>
+        <button type="submit" class="checkout-btn">Sign In</button>
+      </form>
+    </div>
+  </div> 
+  <script>
+    const menus = {
+      burgerHub: [
+        { name: "Classic Cheeseburger", price: 299, desc: "Mutton patty with cheddar cheese" },
+        { name: "Bacon Burger", price: 159, desc: "Crispy bacon and barbecue sauce" },
+        { name: "Veggie Burger", price: 129, desc: "Plant-based patty with Sauce" }
+      ],
+      pizzaPalace: [
+        { name: "Cheese Pizza", price: 99, desc: "Fresh Spicy Pizza" },
+        { name: "Pepperoni Pizza", price: 150, desc: "Classic spicy pepperoni" },
+        { name: "Garlic Chips", price: 130, desc: "Warm chips with garlic butter" }
+      ],
+      tacoTown: [
+        { name: "Chicken Strips (4pices)", price: 190, desc: "Fried Crispy strips" },
+        { name: "Chicken Quesadilla", price: 800, desc: "Grilled chicken and melted cheese" },
+        { name: "Burger", price: 199, desc: "Fleshy Burger" }
+      ]
+    };
+    let cart = [];
+    function loadMenu() {
+      const selectedRestaurant = document.getElementById("restaurantSelect").value;
+      const menuGrid = document.getElementById("menuGrid");
+      menuGrid.innerHTML = "";
+      menus[selectedRestaurant].forEach(item => {
+        const itemCard = `
+          <div class="card">
+            <div>
+              <h3>${item.name}</h3>
+              <p>${item.desc}</p>
+            </div>
+            <div class="card-footer">
+              <span class="price">Rs ${item.price.toFixed(2)}</span>
+              <button class="add-btn" onclick="addToCart('${item.name}', ${item.price})">Add</button>
+            </div>
+          </div>
+        `;
+        menuGrid.innerHTML += itemCard;
+      });
+    }
+    function addToCart(name, price) {
+      cart.push({ name, price });
+      updateCartUI();
+    }
+    function updateCartUI() {
+      const cartItemsElement = document.getElementById("cartItems");
+      const cartTotalElement = document.getElementById("cartTotal");
+      if (cart.length === 0) {
+        cartItemsElement.innerHTML = `<li class="empty-cart-text">Your cart is empty</li>`;
+        cartTotalElement.innerText = "Rs0.00";
+        return;
+      }
+      cartItemsElement.innerHTML = "";
+      let total = 0;
+      cart.forEach((item) => {
+        total += item.price;
+        const li = document.createElement("li");
+        li.className = "cart-item";
+        li.innerHTML = `<span>${item.name}</span> <span>Rs ${item.price.toFixed(2)}</span>`;
+        cartItemsElement.appendChild(li);
+      });
+      cartTotalElement.innerText = `Rs ${total.toFixed(2)}`;
+    }
+    function placeOrder() {
+      if (cart.length === 0) {
+        alert("Please add items to your cart first!");
+      } else {
+        alert("Order placed successfully! Total: " + document.getElementById("cartTotal").innerText);
+        cart = [];
+        updateCartUI();
+      }
+    }
+    const loginModal = document.getElementById("loginModal");
+    document.getElementById("openLogin").addEventListener("click", () => loginModal.style.display = "flex");
+    document.getElementById("closeLogin").addEventListener("click", () => loginModal.style.display = "none");
+    function handleLogin(event) {
+      event.preventDefault();
+      alert("Logged in successfully!");
+      loginModal.style.display = "none";
+      document.getElementById("openLogin").innerText = "Account";
+    }
+    loadMenu();
+  </script>
+</body>
+</html>
